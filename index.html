@@ -1,19 +1,23 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ระบบโหลดเอกสาร</title>
-  <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบอัปโหลดไฟล์เอกสาร</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
       font-family: 'Prompt', sans-serif;
       background-color: #f0f8ff;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
     header {
-      text-align: center;
       background-color: #007aff;
+      text-align: center;
       padding: 20px;
     }
     header img {
@@ -29,156 +33,176 @@
     nav button {
       background: none;
       border: none;
-      padding: 15px 25px;
-      font-size: 16px;
+      padding: 15px 20px;
       cursor: pointer;
       color: #007aff;
+      font-size: 1em;
+      border-bottom: 3px solid transparent;
     }
     nav button.active {
-      border-bottom: 2px solid #007aff;
       font-weight: bold;
+      border-bottom: 3px solid #007aff;
     }
     main {
       padding: 20px;
+      flex: 1;
+      background: white;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      background-color: #fff;
     }
     th, td {
-      padding: 12px;
-      border: 1px solid #ddd;
+      padding: 10px;
+      border: 1px solid #ccc;
       text-align: left;
     }
     footer {
       text-align: center;
-      padding: 15px;
-      background-color: #f0f8ff;
-      font-size: 14px;
+      background-color: #e9e9ed;
+      padding: 20px;
+      font-size: 0.9em;
       color: #555;
+      border-top: 1px solid #ccc;
     }
-    input, textarea {
+    input, select, textarea {
       width: 100%;
-      padding: 8px;
-      margin-top: 10px;
-      margin-bottom: 20px;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 15px;
       border: 1px solid #ccc;
-      border-radius: 5px;
+      border-radius: 8px;
+      font-size: 1em;
     }
-    button.submit-btn {
+    button[type="submit"] {
       background-color: #007aff;
       color: white;
-      padding: 10px 20px;
+      padding: 12px 20px;
       border: none;
       border-radius: 8px;
+      font-size: 1em;
       cursor: pointer;
     }
   </style>
 </head>
 <body>
+  <header>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Seal_of_Ko_Samui.png" alt="Seal of Ko Samui">
+    <h1>ระบบบริหารจัดการงานกองช่างสุขาภิบาล</h1>
+  </header>
 
-<header>
-  <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Seal_of_Ko_Samui.png" alt="ตราเทศบาลเกาะสมุย">
-</header>
+  <nav>
+    <button class="tab-button active" onclick="openTab(event, 'listTab')">รายการไฟล์</button>
+    <button class="tab-button" onclick="openTab(event, 'uploadTab')">อัปโหลดไฟล์</button>
+  </nav>
 
-<nav>
-  <button id="tab-report" class="active" onclick="showTab('report')">รายงานเอกสาร</button>
-  <button id="tab-add" onclick="showTab('add')">เพิ่มเอกสาร</button>
-</nav>
+  <main>
+    <div id="listTab" class="tab-content active">
+      <h2>รายการไฟล์ที่อัปโหลดแล้ว</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ชื่อไฟล์</th>
+            <th>ฝ่าย</th>
+            <th>หมายเหตุ</th>
+            <th>ลิงก์ไฟล์</th>
+          </tr>
+        </thead>
+        <tbody id="fileList">
+          <!-- รายการจะถูกเพิ่มโดย JavaScript -->
+        </tbody>
+      </table>
+    </div>
 
-<main>
-  <!-- ข้อความแจ้งเตือน -->
-  <div id="status-message" style="display: none; padding: 10px; margin-bottom: 15px; border-radius: 5px;"></div>
+    <div id="uploadTab" class="tab-content">
+      <h2>อัปโหลดไฟล์</h2>
+      <form id="uploadForm">
+        <label>ชื่อไฟล์:</label>
+        <input type="text" name="fileName" required>
 
-  <!-- ส่วนอื่น ๆ ของหน้าเว็บ -->
-  <section id="report-tab">
-    <table>
-      <thead>
-        <tr>
-          <th>ลำดับที่</th>
-          <th>ชื่อเอกสาร</th>
-          <th>หมายเหตุ</th>
-          <th>ลิงก์</th>
-        </tr>
-      </thead>
-      <tbody id="report-body"></tbody>
-    </table>
-  </section>
+        <label>ฝ่าย:</label>
+        <select name="department" required>
+          <option value="งานบริหารทั่วไป">งานบริหารทั่วไป</option>
+          <option value="ฝ่ายจัดการคุณภาพน้ำ">ฝ่ายจัดการคุณภาพน้ำ</option>
+          <option value="ฝ่ายจัดการสิ่งแวดล้อมด้านวัสดุใช้แล้ว">ฝ่ายจัดการสิ่งแวดล้อมด้านวัสดุใช้แล้ว</option>
+        </select>
 
-  <section id="add-tab" style="display:none;">
-    <form id="docForm" onsubmit="addDocument(event)">
-      <label>ชื่อเอกสาร:</label>
-      <input type="text" id="docName" required />
-      <label>หมายเหตุ:</label>
-      <textarea id="docNote"></textarea>
-      <label>ลิงก์:</label>
-      <input type="url" id="docLink" required />
-      <button class="submit-btn" type="submit">เพิ่มเอกสาร</button>
-    </form>
-  </section>
-</main>
+        <label>หมายเหตุ:</label>
+        <textarea name="note" rows="3"></textarea>
 
-<footer>
-  ©2025 ระบบบริหารจัดการงานกองช่างสุขาภิบาล โดย นายธีรศักดิ์ พูลเขาล้าน
-</footer>
+        <label>เลือกไฟล์:</label>
+        <input type="file" name="fileInput" required>
 
-<script>
-  const API_URL = 'https://script.google.com/macros/s/AKfycbxSeadyuHW0gvd0EF-ug4awkEqh4n1Yo5kJsg3d5cAu5qUd1Zm-AyeT33MLSMop04-kaw/exec'; // เปลี่ยนตรงนี้เป็น URL จาก Web App
+        <button type="submit">อัปโหลด</button>
+      </form>
+      <p id="uploadStatus"></p>
+    </div>
+  </main>
 
-  document.addEventListener('DOMContentLoaded', loadDocuments);
+  <footer>
+    <p>©2025 ระบบบริหารจัดการงานกองช่างสุขาภิบาล โดย นายธีรศักดิ์ พูลเขาล้าน</p>
+  </footer>
 
-  function showTab(tab) {
-    document.getElementById('report-tab').style.display = (tab === 'report') ? 'block' : 'none';
-    document.getElementById('add-tab').style.display = (tab === 'add') ? 'block' : 'none';
-    document.getElementById('tab-report').classList.toggle('active', tab === 'report');
-    document.getElementById('tab-add').classList.toggle('active', tab === 'add');
-  }
+  <script>
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbxiE5J3zBsYspD3dvwnz_IkWIqQRgRwP5RxyvbF_0UcrHNK0UkDkFC2_6jFKMpVzhhssA/exec';
 
-  function loadDocuments() {
-  fetch(`${API_URL}?action=getList`)
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        const table = document.getElementById('report-body');
-        table.innerHTML = '';
-        data.documents.forEach((doc, i) => {
-          const row = table.insertRow();
-          row.innerHTML = `
-            <td>${i + 1}</td>
-            <td>${doc.name}</td>
-            <td>${doc.department}</td>
-            <td><a href="${doc.url}" target="_blank">ดาวน์โหลด</a></td>
-          `;
-        });
-      }
+    function openTab(evt, tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      evt.currentTarget.classList.add('active');
+    }
+
+    document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const file = form.fileInput.files[0];
+      const reader = new FileReader();
+      reader.onload = async function() {
+        const base64 = reader.result.split(',')[1];
+        const data = {
+          method: 'POST',
+          body: new URLSearchParams({
+            action: 'upload',
+            fileName: form.fileName.value,
+            department: form.department.value,
+            note: form.note.value,
+            fileInput: base64,
+            mimeType: file.type,
+            originalFilename: file.name
+          })
+        };
+        const res = await fetch(scriptUrl, data);
+        const result = await res.json();
+        document.getElementById('uploadStatus').textContent = result.success ? 'อัปโหลดสำเร็จ' : 'ผิดพลาด: ' + result.message;
+        if (result.success) loadFileList();
+      };
+      reader.readAsDataURL(file);
     });
-}
 
+    async function loadFileList() {
+      const res = await fetch(`${scriptUrl}?action=getList`);
+      const data = await res.json();
+      const listEl = document.getElementById('fileList');
+      listEl.innerHTML = '';
+      data.documents.forEach(doc => {
+        const row = `<tr>
+          <td>${doc.name}</td>
+          <td>${doc.department}</td>
+          <td>${doc.note}</td>
+          <td><a href="${doc.url}" target="_blank">เปิด</a></td>
+        </tr>`;
+        listEl.insertAdjacentHTML('beforeend', row);
+      });
+    }
 
-
-  function addDocument(e) {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append('name', document.getElementById('docName').value);
-    formData.append('note', document.getElementById('docNote').value);
-    formData.append('link', document.getElementById('docLink').value);
-    fetch(API_URL, {
-      method: 'POST',
-      body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        document.getElementById('docForm').reset();
-        showTab('report');
-        loadDocuments();
-      } else {
-        alert('ไม่สามารถเพิ่มข้อมูลได้');
-      }
-    });
-  }
-</script>
-
+    window.onload = loadFileList;
+  </script>
 </body>
 </html>
