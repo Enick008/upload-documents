@@ -1,69 +1,178 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <title>อัพโหลดเอกสาร - กองช่างสุขาภิบาล</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ระบบโหลดเอกสาร</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet" />
   <style>
     body {
+      margin: 0;
       font-family: 'Prompt', sans-serif;
       background-color: #f0f8ff;
-      padding: 30px;
-      text-align: center;
     }
-    h2 {
+    header {
+      text-align: center;
+      background-color: #007aff;
+      padding: 20px;
+    }
+    header img {
+      height: 100px;
+      width: auto;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      background-color: #e0f0ff;
+      border-bottom: 1px solid #ccc;
+    }
+    nav button {
+      background: none;
+      border: none;
+      padding: 15px 25px;
+      font-size: 16px;
+      cursor: pointer;
       color: #007aff;
     }
-    form {
-      display: inline-block;
-      text-align: left;
+    nav button.active {
+      border-bottom: 2px solid #007aff;
+      font-weight: bold;
+    }
+    main {
       padding: 20px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #ccc;
     }
-    label {
-      display: block;
-      margin-top: 10px;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #fff;
     }
-    input, select, button {
-      margin-top: 5px;
+    th, td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    footer {
+      text-align: center;
+      padding: 15px;
+      background-color: #f0f8ff;
+      font-size: 14px;
+      color: #555;
+    }
+    input, textarea {
       width: 100%;
       padding: 8px;
-      font-family: inherit;
-      font-size: 16px;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
     }
-    button {
+    button.submit-btn {
       background-color: #007aff;
       color: white;
+      padding: 10px 20px;
       border: none;
-      margin-top: 20px;
+      border-radius: 8px;
       cursor: pointer;
-      border-radius: 6px;
-    }
-    button:hover {
-      background-color: #005dc1;
     }
   </style>
 </head>
 <body>
 
-  <h2>📤 อัพโหลดเอกสาร กองช่างสุขาภิบาล</h2>
+<header>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Seal_of_Ko_Samui.png" alt="ตราเทศบาลเกาะสมุย">
+</header>
 
-  <form method="POST" enctype="multipart/form-data" action="https://script.google.com/macros/s/AKfycbzYwE32ez5TBL8ONjhzm_1vZqa-UkREO1NXQ74X7dBjPyOhURd6lWY4TBlYciooSQykhw/exec">
-    
-    <label for="department">เลือกฝ่าย:</label>
-    <select name="department" id="department" required>
-      <option value="">-- เลือกฝ่าย --</option>
-      <option value="งานจัดเก็บขยะ">บริหารงานทั่วไป</option>
-      <option value="งานดูดสิ่งปฏิกูล">ฝ่ายจัดการสิ่งแวดล้อมด้านวัสดุใช้แล้ว</option>
-      <option value="งานสุขาภิบาลทั่วไป">ฝ่ายปรับปรุงคุณภาพน้ำ</option>
-    </select>
+<nav>
+  <button id="tab-report" class="active" onclick="showTab('report')">รายงานเอกสาร</button>
+  <button id="tab-add" onclick="showTab('add')">เพิ่มเอกสาร</button>
+</nav>
 
-    <label for="file">เลือกเอกสาร:</label>
-    <input type="file" name="file" id="file" required>
+<main>
+  <section id="report-tab">
+    <table>
+      <thead>
+        <tr>
+          <th>ลำดับที่</th>
+          <th>ชื่อเอกสาร</th>
+          <th>หมายเหตุ</th>
+          <th>ลิงก์</th>
+        </tr>
+      </thead>
+      <tbody id="report-body"></tbody>
+    </table>
+  </section>
 
-    <button type="submit">📤 อัพโหลดเอกสาร</button>
-  </form>
+  <section id="add-tab" style="display:none;">
+    <form id="docForm" onsubmit="addDocument(event)">
+      <label>ชื่อเอกสาร:</label>
+      <input type="text" id="docName" required />
+      <label>หมายเหตุ:</label>
+      <textarea id="docNote"></textarea>
+      <label>ลิงก์:</label>
+      <input type="url" id="docLink" required />
+      <button class="submit-btn" type="submit">เพิ่มเอกสาร</button>
+    </form>
+  </section>
+</main>
+
+<footer>
+  ©2025 ระบบบริหารจัดการงานกองช่างสุขาภิบาล โดย นายธีรศักดิ์ พูลเขาล้าน
+</footer>
+
+<script>
+  const API_URL = 'YOUR_DEPLOYED_WEBAPP_URL'; // เปลี่ยนตรงนี้เป็น URL จาก Web App
+
+  document.addEventListener('DOMContentLoaded', loadDocuments);
+
+  function showTab(tab) {
+    document.getElementById('report-tab').style.display = (tab === 'report') ? 'block' : 'none';
+    document.getElementById('add-tab').style.display = (tab === 'add') ? 'block' : 'none';
+    document.getElementById('tab-report').classList.toggle('active', tab === 'report');
+    document.getElementById('tab-add').classList.toggle('active', tab === 'add');
+  }
+
+  function loadDocuments() {
+    fetch(`${API_URL}?action=list`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          const table = document.getElementById('report-body');
+          table.innerHTML = '';
+          data.documents.forEach((doc, i) => {
+            const row = table.insertRow();
+            row.innerHTML = `
+              <td>${i + 1}</td>
+              <td>${doc.name}</td>
+              <td>${doc.note}</td>
+              <td><a href="${doc.link}" target="_blank">ดาวน์โหลด</a></td>
+            `;
+          });
+        }
+      });
+  }
+
+  function addDocument(e) {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append('name', document.getElementById('docName').value);
+    formData.append('note', document.getElementById('docNote').value);
+    formData.append('link', document.getElementById('docLink').value);
+    fetch(API_URL, {
+      method: 'POST',
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById('docForm').reset();
+        showTab('report');
+        loadDocuments();
+      } else {
+        alert('ไม่สามารถเพิ่มข้อมูลได้');
+      }
+    });
+  }
+</script>
 
 </body>
 </html>
