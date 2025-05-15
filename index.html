@@ -136,7 +136,7 @@
   }
 
   function loadDocuments() {
-  fetch(`${API_URL}?action=getList`)  // action ต้องตรงกับฝั่ง server
+  fetch(`${API_URL}?action=getList`)
     .then(res => res.json())
     .then(data => {
       if (data.success) {
@@ -154,6 +154,7 @@
       }
     });
 }
+
 
 
   function addDocument(e) {
