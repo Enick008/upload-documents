@@ -150,59 +150,96 @@
   </footer>
 
   <script>
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbxiE5J3zBsYspD3dvwnz_IkWIqQRgRwP5RxyvbF_0UcrHNK0UkDkFC2_6jFKMpVzhhssA/exec';
+  const scriptUrl = 'https://script.google.com/macros/s/AKfycbxiE5J3zBsYspD3dvwnz_IkWIqQRgRwP5RxyvbF_0UcrHNK0UkDkFC2_6jFKMpVzhhssA/exec';
 
-    function openTab(evt, tabId) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      evt.currentTarget.classList.add('active');
-    }
+  function openTab(evt, tabId) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    evt.currentTarget.classList.add('active');
+  }
 
-    document.getElementById('uploadForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const form = e.target;
-      const file = form.fileInput.files[0];
-      const reader = new FileReader();
-      reader.onload = async function() {
-        const base64 = reader.result.split(',')[1];
-        const data = {
-          method: 'POST',
-          body: new URLSearchParams({
-            action: 'upload',
-            fileName: form.fileName.value,
-            department: form.department.value,
-            note: form.note.value,
-            fileInput: base64,
-            mimeType: file.type,
-            originalFilename: file.name
-          })
-        };
-        const res = await fetch(scriptUrl, data);
-        const result = await res.json();
-        document.getElementById('uploadStatus').textContent = result.success ? 'อัปโหลดสำเร็จ' : 'ผิดพลาด: ' + result.message;
-        if (result.success) loadFileList();
+  document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const form = e.target;
+    const file = form.fileInput.files[0];
+    const reader = new FileReader();
+    reader.onload = async function() {
+      const base64 = reader.result.split(',')[1];
+      const data = {
+        method: 'POST',
+        body: new URLSearchParams({
+          action: 'upload',
+          fileName: form.fileName.value,
+          department: form.department.value,
+          note: form.note.value,
+          fileInput: base64,
+          mimeType: file.type,
+          originalFilename: file.name
+        })
       };
-      reader.readAsDataURL(file);
+      const res = await fetch(scriptUrl, data);
+      const result = await res.json();
+      document.getElementById('uploadStatus').textContent = result.success ? 'อัปโหลดสำเร็จ' : 'ผิดพลาด: ' + result.message;
+      if (result.success) loadFileList();
+    };
+    reader.readAsDataURL(file);
+  });
+
+  async function loadFileList() {
+    const res = await fetch(`${scriptUrl}?action=getList`);
+    const data = await res.json();
+    const listEl = document.getElementById('fileList');
+    listEl.innerHTML = '';
+    data.documents.forEach(doc => {
+      const row = `<tr>
+        <td>${doc.name}</td>
+        <td>${doc.department}</td>
+        <td><span class="note">${doc.note}</span></td>
+        <td><a href="${doc.url}" target="_blank">เปิด</a></td>
+        <td>
+          <button onclick="deleteFile('${doc.name}')">ลบ</button>
+          <button onclick="editNote('${doc.name}', this)">แก้ไข</button>
+        </td>
+      </tr>`;
+      listEl.insertAdjacentHTML('beforeend', row);
     });
+  }
 
-    async function loadFileList() {
-      const res = await fetch(`${scriptUrl}?action=getList`);
-      const data = await res.json();
-      const listEl = document.getElementById('fileList');
-      listEl.innerHTML = '';
-      data.documents.forEach(doc => {
-        const row = `<tr>
-          <td>${doc.name}</td>
-          <td>${doc.department}</td>
-          <td>${doc.note}</td>
-          <td><a href="${doc.url}" target="_blank">เปิด</a></td>
-        </tr>`;
-        listEl.insertAdjacentHTML('beforeend', row);
-      });
+  async function deleteFile(fileName) {
+    if (!confirm(`ยืนยันการลบไฟล์ "${fileName}"?`)) return;
+    const res = await fetch(scriptUrl, {
+      method: 'POST',
+      body: new URLSearchParams({ action: 'delete', fileName })
+    });
+    const result = await res.json();
+    if (result.success) {
+      alert('ลบสำเร็จ');
+      loadFileList();
+    } else {
+      alert('ผิดพลาด: ' + result.message);
     }
+  }
 
-    window.onload = loadFileList;
-  </script>
+  async function editNote(fileName, btn) {
+    const oldNote = btn.closest('tr').querySelector('.note').innerText;
+    const newNote = prompt('แก้ไขหมายเหตุ:', oldNote);
+    if (newNote !== null) {
+      const res = await fetch(scriptUrl, {
+        method: 'POST',
+        body: new URLSearchParams({ action: 'updateNote', fileName, newNote })
+      });
+      const result = await res.json();
+      if (result.success) {
+        alert('บันทึกสำเร็จ');
+        loadFileList();
+      } else {
+        alert('ผิดพลาด: ' + result.message);
+      }
+    }
+  }
+
+  window.onload = loadFileList;
+</script>
 </body>
 </html>
