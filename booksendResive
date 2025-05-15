@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบรับส่งหนังสือราชการ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .tab-active {
+            background-color: #e0f2fe; /* สีฟ้าอ่อน */
+            color: #0b527e; /* สีน้ำเงินเข้ม */
+            border-bottom: 2px solid #0b527e;
+        }
+        .tab-inactive {
+            background-color: #f8fafc; /* สีพื้นหลังอ่อน */
+            color: #4b5563; /* สีเทา */
+        }
+        .tab-inactive:hover {
+            background-color: #f1f5f9; /* สีพื้นหลังเมื่อโฮเวอร์ */
+        }
+        .form-section {
+            background-color: #ffffff; /* สีขาว */
+            padding: 2rem;
+            border-radius: 0.5rem; /* rounded-md */
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1); /* shadow-sm */
+            margin-bottom: 2rem;
+        }
+        .table-section {
+            background-color: #ffffff; /* สีขาว */
+            padding: 2rem;
+            border-radius: 0.5rem; /* rounded-md */
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1); /* shadow-sm */
+            margin-bottom: 2rem;
+        }
+
+        /* Styles for iOS-like blue */
+        .ios-blue {
+            background-color: #007aff;
+            color: white;
+        }
+
+        .ios-blue:hover {
+            background-color: #0064d1;
+        }
+
+        /* Pastel color scheme */
+        .pastel-blue {
+            background-color: #e0f7fa; /* Light cyan */
+            color: #00897b; /* Teal */
+        }
+
+        .pastel-blue:hover {
+            background-color: #b2ebf2; /* Lighter cyan */
+        }
+
+        .pastel-pink {
+            background-color: #fce4ec; /* Light pink */
+            color: #c2185b; /* Deep pink */
+        }
+
+        .pastel-pink:hover {
+            background-color: #f8bbd0; /* Lighter pink */
+        }
+
+        .pastel-green {
+            background-color: #f0f4c3; /* Light yellow-green */
+            color: #7cb342; /* Light green */
+        }
+
+        .pastel-green:hover {
+            background-color: #e6ee96; /* Lighter yellow-green */
+        }
+
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <header class="bg-blue-500 text-white py-4 flex justify-center items-center">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Seal_of_Ko_Samui.png" alt="Seal of Ko Samui" height="100" class="mr-4">
+        <h1 class="text-2xl font-semibold">ระบบรับส่งหนังสือราชการ</h1>
+    </header>
+
+    <nav class="bg-gray-200 py-2">
+        <div class="container mx-auto flex justify-center">
+            <button id="tab-receive" class="tab tab-active px-4 py-2 rounded-md mr-2 focus:outline-none">หนังสือรับ</button>
+            <button id="tab-send" class="tab tab-inactive px-4 py-2 rounded-md focus:outline-none">หนังสือส่ง</button>
+            <button id="tab-statistics" class="tab tab-inactive px-4 py-2 rounded-md focus:outline-none">สถิติ</button> </div>
+    </nav>
+
+    <main class="container mx-auto mt-4">
+        <section id="section-receive" class="section">
+            <div class="form-section">
+                <h2 class="text-xl font-semibold mb-4">หนังสือรับ</h2>
+                <form id="receive-form" class="space-y-4">
+                    <div>
+                        <label for="receive-date" class="block text-gray-700 text-sm font-bold mb-2">วันที่รับ:</label>
+                        <input type="date" id="receive-date" name="receive-date" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div>
+                        <label for="receive-reg-no" class="block text-gray-700 text-sm font-bold mb-2">ทะเบียนรับเทศบาล:</label>
+                        <input type="text" id="receive-reg-no" name="receive-reg-no" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div>
+                        <label for="receive-type" class="block text-gray-700 text-sm font-bold mb-2">ประเภทหนังสือราชการ:</label>
+                        <select id="receive-type" name="receive-type" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <option value="">เลือกประเภทหนังสือ</option>
+                            <option value="ภายใน">หนังสือภายใน</option>
+                            <option value="ภายนอก">หนังสือภายนอก</option>
+                            <option value="คำสั่ง">คำสั่ง</option>
+                            <option value="ประกาศ">ประกาศ</option>
+                            <option value="รายงาน">รายงาน</option>
+                            <option value="อื่นๆ">อื่นๆ</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="receive-work-group" class="block text-gray-700 text-sm font-bold mb-2">หมวดหมู่หนังสือเข้างาน:</label>
+                        <select id="receive-work-group" name="receive-work-group" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <option value="">เลือกหมวดหมู่</option>
+                            <option value="บริหารทั่วไป">งานบริหารทั่วไป</option>
+                            <option value="ปรับปรุงคุณภาพน้ำ">ฝ่ายปรับปรุงคุณภาพน้ำ</option>
+                            <option value="จัดการสิ่งแวดล้อม">ฝ่ายจัดการสิ่งแวดล้อมด้านวัสดุใช้แล้ว</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="receive-subject" class="block text-gray-700 text-sm font-bold mb-2">หัวเรื่อง:</label>
+                        <input type="text" id="receive-subject" name="receive-subject" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div>
+                        <label for="receive-sender" class="block text-gray-700 text-sm font-bold mb-2">ผู้ส่ง:</label>
+                        <input type="text" id="receive-sender" name="receive-sender" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div>
+                        <label for="receive-send-date" class="block text-gray-700 text-sm font-bold mb-2">วันที่ส่ง:</label>
+                        <input type="date" id="receive-send-date" name="receive-send-date" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div>
+                        <label for="receive-receiver" class="block text-gray-700 text-sm font-bold mb-2">ผู้รับ:</label>
+                        <input type="text" id="receive-receiver" name="receive-receiver" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div>
+                        <label for="receive-status" class="block text-gray-700 text-sm font-bold mb-2">สถานะ:</label>
+                        <select id="receive-status" name="receive-status" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <option value="">เลือกสถานะ</option>
+                            <option value="อยู่ระหว่างเสนอ">อยู่ระหว่างเสนอ</option>
+                            <option value="ดำเนินการแล้วเสร็จ">ดำเนินการแล้วเสร็จ</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="receive-recorder" class="block text-gray-700 text-sm font-bold mb-2">ผู้บันทึกข้อมูล:</label>
+                        <input type="text" id="receive-recorder" name="receive-recorder" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div>
+                        <label for="receive-file" class="block text-gray-700 text-sm font-bold mb-2">อัพโหลดเอกสาร:</label>
+                        <input type="file" id="receive-file" name="receive-file" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">บันทึกข้อมูล</button>
+                    <div id="receive-status-message" class="mt-4 text-yellow-600 font-semibold"></div>
+                </form>
+            </div>
+
+            <div class="table-section">
+                <h3 class="text-lg font-semibold mb-4">รายการหนังสือรับ (อยู่ระหว่างดำเนินการ)</h3>
+                <div class="mb-4">
+                    <input type="text" id="receive-search" placeholder="ค้นหา..." class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2">
+                    <select id="receive-filter-status" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="">ทุกสถานะ</option>
+                        <option value="อยู่ระหว่างเสนอ">อยู่ระหว่างเสนอ</option>
+                        <option value="ดำเนินการแล้วเสร็จ">ดำเนินการแล้วเสร็จ</option>
+                    </select>
+                </div>
+                <table id="receive-table" class="min-w-full table-auto rounded-lg hidden">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="px-4 py-2 text-left">ทะเบียนรับเทศบาล</th>
+                            <th class="px-4 py-2 text-left">วันที่รับ</th>
+                            <th class="px-4 py-2 text-left">ประเภทหนังสือราชการ</th>
+                            <th class="px-4 py-2 text-left">หัวเรื่อง</th>
+                            <th class="px-4 py-2 text-left">ผู้ส่ง</th>
+                            <th class="px-4 py-2 text-left">วันที่ส่ง</th>
+                            <th class="px-4 py-2 text-left">ผู้รับ</th>
+                            <th class="px-4 py-2 text-left">สถานะ</th>
+                            <th class="px-4 py-2 text-left">การจัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-700">
+                        <tr>
+                            <td colspan="9" class="px-4 py-2 text-center text-gray-500">ไม่มีข้อมูล</td>
+                        </tr>
+                    </tbody>
+                </table>
+                 <div id="receive-table-message" class="mt-4 text-gray-500 text-center">Loading data...</div>
+            </div>
+        </section>
+
+        <section id="section-send" class="section hidden">
+            <div class="form-section">
+                <h2 class="text-xl font-semibold mb-4">หนังสือส่ง</h2>
+                <form id="send-form" class="space-y-4">
+                    <div>
+                        <label for="send-date" class="block text-gray-700 text-sm font-bold mb-2">วันที่ส่ง:</label>
+                        <input type="date" id="send-date" name="send-date" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div>
+                        <label for="send-reg-no" class="block text-gray-700 text-sm font-bold mb-2">ทะเบียนส่ง:</label>
+                        <input type="text" id="send-reg-no" name="send-reg-no" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div>
+                        <label for="send-type" class="block text-gray-700 text-sm font-bold mb-2">ประเภทหนังสือ:</label>
+                        <select id="send-type" name="send-type" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <option value="">เลือกประเภทหนังสือ</option>
+                            <option value="ภายใน">หนังสือภายใน</option>
+                            <option value="ภายนอก">หนังสือภายนอก</option>
+                            <option value="คำสั่ง">คำสั่ง</option>
+                            <option value="ประกาศ">ประกาศ</option>
+                            <option value="รายงาน">รายงาน</option>
+                             <option value="อื่นๆ">อื่นๆ</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="send-subject" class="block text-gray-700 text-sm font-bold mb-2">หัวเรื่อง:</label>
+                        <input type="text" id="send-subject" name="send-subject" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                     <div>
+                        <label for="send-receiver" class="block text-gray-700 text-sm font-bold mb-2">ผู้รับ:</label>
+                        <input type="text" id="send-receiver" name="send-receiver" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div>
+                        <label for="send-receive-date" class="block text-gray-700 text-sm font-bold mb-2">วันที่รับเรื่อง:</label>
+                        <input type="date" id="send-receive-date" name="send-receive-date" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div>
+                        <label for="send-status" class="block text-gray-700 text-sm font-bold mb-2">สถานะ:</label>
+                        <select id="send-status" name="send-status" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <option value="">เลือกสถานะ</option>
+                            <option value="อยู่ระหว่างเสนอ">อยู่ระหว่างเสนอ</option>
+                            <option value="ดำเนินการแล้วเสร็จ">ดำเนินการแล้วเสร็จ</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="send-recorder" class="block text-gray-700 text-sm font-bold mb-2">ผู้บันทึกข้อมูล:</label>
+                        <input type="text" id="send-recorder" name="send-recorder" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div>
+                        <label for="send-file" class="block text-gray-700 text-sm font-bold mb-2">อัพโหลดเอกสาร:</label>
+                        <input type="file" id="send-file" name="send-file" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">บันทึกข้อมูล</button>
+                    <div id="send-status-message" class="mt-4 text-yellow-600 font-semibold"></div>
+                </form>
+            </div>
+
+            <div class="table-section">
+                <h3 class="text-lg font-semibold mb-4">รายการหนังสือส่ง (อยู่ระหว่างดำเนินการ)</h3>
+                <div class="mb-4">
+                    <input type="text" id="send-search" placeholder="ค้นหา..." class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2">
+                     <select id="send-filter-status" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="">ทุกสถานะ</option>
+                        <option value="อยู่ระหว่างเสนอ">อยู่ระหว่างเสนอ</option>
+                        <option value="ดำเนินการแล้วเสร็จ">ดำเนินการแล้วเสร็จ</option>
+                    </select>
+                </div>
+                <table id="send-table" class="min-w-full table-auto rounded-lg hidden">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="px-4 py-2 text-left">ทะเบียนส่ง</th>
+                            <th class="px-4 py-2 text-left">วันที่ส่ง</th>
+                            <th class="px-4 py-2 text-left">ประเภทหนังสือ</th>
+                            <th class="px-4 py-2 text-left">หัวเรื่อง</th>
+                            <th class="px-4 py-2 text-left">ผู้รับ</th>
+                            <th class="px-4 py-2 text-left">วันที่รับเรื่อง</th>
+                            <th class="px-4 py-2 text-left">สถานะ</th>
+                            <th class="px-4 py-2 text-left">การจัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-700">
+                         <tr>
+                            <td colspan="8" class="px-4 py-2 text-center text-gray-500">ไม่มีข้อมูล</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div id="send-table-message" class="mt-4 text-gray-500 text-center">Loading data...</div>
+            </div>
+        </section>
+
+        <section id="section-statistics" class="section hidden">
+            <div class="bg-white p-6 rounded-md shadow-md">
+                <h2 class="text-2xl font-semibold mb-4">สถิติ</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">สถิติหนังสือรับ</h3>
+                        <ul id="receive-statistics-list" class="list-disc list-inside">
+                            <li>รวมทั้งหมด: <span id="receive-total">0</span> ฉบับ</li>
+                            <li>อยู่ระหว่างดำเนินการ: <span id="receive-pending">0</span> ฉบับ</li>
+                            <li>ดำเนินการแล้วเสร็จ: <span id="receive-completed">0</span> ฉบับ</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">สถิติหนังสือส่ง</h3>
+                        <ul id="send-statistics-list" class="list-disc list-inside">
+                            <li>รวมทั้งหมด: <span id="send-total">0</span> ฉบับ</li>
+                            <li>อยู่ระหว่างดำเนินการ: <span id="send-pending">0</span> ฉบับ</li>
+                            <li>ดำเนินการแล้วเสร็จ: <span id="send-completed">0</span> ฉบับ</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-200 text-gray-700 py-4 text-center mt-8">
+        © 2025 ระบบบริหารจัดการงานกองช่างสุขาภิบาล โดย นายธีรศักดิ์ พูลเขาล้าน
+    </footer>
+
+    <script>
+        const tabs = document.querySelectorAll('.tab');
+        const sections = document.querySelectorAll('.section');
+        const receiveForm = document.getElementById('receive-form');
+        const sendForm = document.getElementById('send-form');
+        const receiveTable = document.getElementById('receive-table');
+        const sendTable = document.getElementById('send-table');
+        const receiveStatusMessage = document.getElementById('receive-status-message');
+        const sendStatusMessage = document.getElementById('send-status-message');
+        const receiveSearchInput = document.getElementById('receive-search');
+        const sendSearchInput = document.getElementById('send-search');
+        const receiveFilterStatus = document.getElementById('receive-filter-status');
+        const sendFilterStatus = document.getElementById('send-filter-status');
+
+        // Get Statistics Elements
+        const receiveTotalElement = document.getElementById('receive-total');
+        const receivePendingElement = document.getElementById('receive-pending');
+        const receiveCompletedElement = document.getElementById('receive-completed');
+        const sendTotalElement = document.getElementById('send-total');
+        const sendPendingElement = document.getElementById('send-pending');
+        const sendCompletedElement = document.getElementById('send-completed');
+        const tabStatistics = document.getElementById('tab-statistics'); // Get the tab
+        const sectionStatistics = document.getElementById('section-statistics'); // Get the section
+
+        let receiveData = [];
+        let sendData = [];
+        let editingId = null;
+        let currentTab = 'receive'; // Keep track of the current tab
+
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyGs5cVEgNWbAcbG5O61SKaNhe22uAlaBJVSEaXZDF33h_ngggQcomaVGL5lhMSHfF2WQ/exec'; // Replace with your Google Apps Script URL
+        const SHEET_ID = '1uOo_wsWfA7cO3initNwUaoseXtNLuDEmDQ2O5A5v1S8'; // Replace with your Google Sheet ID
+        const FOLDER_ID = '1Miz44jDIMrl1ZGmSEt23TXNu7rzK-1w1'; // Replace with your Google Drive Folder ID
+
+        // Function to set active tab and display corresponding section
+        function switchTab(tabId) {
+            tabs.forEach(tab => tab.classList.remove('tab-active'));
+            sections.forEach(section => section.classList.add('hidden'));
+
+            const activeTab = document.getElementById(`tab-${tabId}`);
+            const activeSection = document.getElementById(`section-${tabId}`);
+
+            activeTab.classList.add('tab-active');
+            activeTab.classList.remove('tab-inactive');
+            activeSection.classList.remove('hidden');
+            currentTab = tabId; // Update currentTab
+             if (tabId === 'statistics') {
+                updateStatistics();
+             }
+            loadExistingData(tabId); // Load data when switching tabs
+        }
+
+        // Event listeners for tab switching
+        document.getElementById('tab-receive').addEventListener('click', () => switchTab('receive'));
+        document.getElementById('tab-send').addEventListener('click', () => switchTab('send'));
+        document.getElementById('tab-statistics').addEventListener('click', () => switchTab('statistics'));
+
+        // Initial tab setup
+        switchTab('receive');
+
+        // Function to handle form submission (add/edit data)
+        function handleSubmit(event, formType) {
+            event.preventDefault();
+
+            const statusMessageElement = formType === 'receive' ? receiveStatusMessage : sendStatusMessage;
+            statusMessageElement.textContent = 'กำลังบันทึกข้อมูล...';
+
+            const formData = new FormData(event.target);
+            const data = {};
+            formData.forEach((value, key) => {
+                if (key === 'receive-file' || key === 'send-file') {
+                    // Handle file upload separately
+                    const file = formData.get(key);
+                    if (file.size > 0) {
+                      // In a real scenario, you would upload the file to Google Drive
+                      // and get the URL.  For this example, we'll just store the filename.
+                      data[key] = file.name;  // Store the filename
+                    } else {
+                       data[key] = ''; // No file uploaded
+                    }
+                } else {
+                  data[key] = value;
+                }
+            });
+
+            if (editingId) {
+                data.id = editingId;
+            } else {
+                data.id = Date.now();
+            }
+
+             // Determine the sheet name based on the form type
+            const sheetName = formType === 'receive' ? 'receive' : 'send';
+
+            // Prepare the data for sending to Google Apps Script
+            const requestData = {
+                action: editingId ? 'editData' : 'addData',
+                sheetName: sheetName,
+                data: data,
+            };
+
+            // Send the data to Google Apps Script using JSONP
+            const scriptUrl = `${SCRIPT_URL}?callback=handleResponse&data=${encodeURIComponent(JSON.stringify(requestData))}`;
+            const script = document.createElement('script');
+            script.src = scriptUrl;
+            script.async = true;
+            script.defer = true;
+            document.body.appendChild(script);
+
+            // Clean up the script tag after it's done
+            script.onload = () => {
+                document.body.removeChild(script);
+            };
+            script.onerror = () => {
+                statusMessageElement.textContent = 'เกิดข้อผิดพลาดในการบันทึกข้อมูล';
+                document.body.removeChild(script);
+            };
+            editingId = null;
+        }
+
+        // Attach event listeners to the forms
+        receiveForm.addEventListener('submit', (event) => handleSubmit(event, 'receive'));
+        sendForm.addEventListener('submit', (event) => handleSubmit(event, 'send'));
+
+       // Callback function to handle the response from Google Apps Script
+        function handleResponse(response) {
+            const formType = response.sheetName;
+            const statusMessageElement = formType === 'receive' ? receiveStatusMessage : sendStatusMessage;
+
+            if (response.success) {
+                statusMessageElement.textContent = 'บันทึกข้อมูลสำเร็จ';
+                if (formType === 'receive') {
+                    receiveForm.reset();
+                    loadExistingData('receive'); // Reload receive data
+                } else {
+                    sendForm.reset();
+                    loadExistingData('send'); // Reload send data
+                }
+
+            } else {
+                statusMessageElement.textContent = 'เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + response.message;
+            }
+             setTimeout(() => {
+                statusMessageElement.textContent = ''; // Clear message
+            }, 5000);
+        }
+
+        // Function to load existing data from Google Sheets
+        function loadExistingData(sheetName) {
+            const table = sheetName === 'receive' ? receiveTable : sendTable;
+            const tableMessageElement = sheetName === 'receive' ? document.getElementById('receive-table-message') : document.getElementById('send-table-message');
+
+            tableMessageElement.textContent = 'กำลังโหลดข้อมูล...';
+            table.classList.add('hidden'); // Hide the table initially
+
+            const requestData = {
+                action: 'getData',
+                sheetName: sheetName,
+            };
+
+            const scriptUrl = `${SCRIPT_URL}?callback=handleDataResponse&data=${encodeURIComponent(JSON.stringify(requestData))}`;
+            const script = document.createElement('script');
+            script.src = scriptUrl;
+            script.async = true;
+            script.defer = true;
+            document.body.appendChild(script);
+
+             script.onload = () => {
+                document.body.removeChild(script);
+            };
+            script.onerror = () => {
+                tableMessageElement.textContent = 'เกิดข้อผิดพลาดในการโหลดข้อมูล';
+                table.classList.add('hidden');
+                document.body.removeChild(script);
+            };
+        }
+
+        // Callback function to handle the data response from Google Apps Script
+        function handleDataResponse(response) {
+            const sheetName = response.sheetName;
+            const table = sheetName === 'receive' ? receiveTable : sendTable;
+            const tableMessageElement = sheetName === 'receive' ? document.getElementById('receive-table-message') : document.getElementById('send-table-message');
+
+            if (response.success) {
+                const data = response.data;
+                if (sheetName === 'receive') {
+                    receiveData = data;
+                } else if (sheetName === 'send') {
+                    sendData = data;
+                }
+                populateTable(data, sheetName);
+                tableMessageElement.textContent = ''; // Clear message
+                table.classList.remove('hidden'); // Show the table
+            } else {
+                tableMessageElement.textContent = 'เกิดข้อผิดพลาดในการโหลดข้อมูล: ' + response.message;
+                table.classList.add('hidden'); // Ensure table is hidden on error
+            }
+        }
+
+        // Function to populate the table with data
+        function populateTable(data, sheetName) {
+            const table = sheetName === 'receive' ? receiveTable : sendTable;
+            const tbody = table.querySelector('tbody');
+            tbody.innerHTML = ''; // Clear existing table rows
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${table.querySelector('thead tr').children.length}" class="px-4 py-2 text-center text-gray-500">ไม่มีข้อมูล</td></tr>`;
+                return;
+            }
+
+            const filteredData = filterAndSearchData(data, sheetName);
+
+            filteredData.forEach(item => {
+                const row = document.createElement('tr');
+                for (const key in item) {
+                    if (key !== 'id') { // Exclude the 'id'
+                        const cell = document.createElement('td');
+                        cell.classList.add('px-4', 'py-2');
+                        cell.textContent = item[key];
+                        row.appendChild(cell);
+                    }
+                }
+
+                // Add "Edit/Delete/View Details" buttons
+                const actionsCell = document.createElement('td');
+                actionsCell.classList.add('px-4', 'py-2');
+
+                const editButton = document.createElement('button');
+                editButton.textContent = 'แก้ไข';
+                editButton.classList.add('bg-yellow-500', 'hover:bg-yellow-700', 'text-white', 'font-bold', 'py-1', 'px-2', 'rounded', 'text-sm', 'mr-1');
+                editButton.addEventListener('click', () => handleEdit(item.id, sheetName));
+                actionsCell.appendChild(editButton);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'ลบ';
+                deleteButton.classList.add('bg-red-500', 'hover:bg-red-700', 'text-white', 'font-bold', 'py-1', 'px-2', 'rounded', 'text-sm', 'mr-1');
+                deleteButton.addEventListener('click', () => handleDelete(item.id, sheetName));
+                actionsCell.appendChild(deleteButton);
+
+                const viewButton = document.createElement('button');
+                viewButton.textContent = 'ดูรายละเอียด';
+                viewButton.classList.add('bg-green-500', 'hover:bg-green-700', 'text-white', 'font-bold', 'py-1', 'px-2', 'rounded', 'text-sm');
+                viewButton.addEventListener('click', () => handleViewDetails(item, sheetName));
+                actionsCell.appendChild(viewButton);
+
+                row.appendChild(actionsCell);
+                tbody.appendChild(row);
+            });
+        }
+
+        function filterAndSearchData(data, sheetName) {
+            const searchTerm = sheetName === 'receive' ? receiveSearchInput.value.toLowerCase() : sendSearchInput.value.toLowerCase();
+            const filterStatus = sheetName === 'receive' ? receiveFilterStatus.value : sendFilterStatus.value;
+
+            return data.filter(item => {
+                let matchesSearch = Object.values(item).some(val =>
+                    String(val).toLowerCase().includes(searchTerm)
+                );
+
+                let matchesStatus = !filterStatus || item.status === filterStatus;
+
+                return matchesSearch && matchesStatus;
+            });
+        }
+
+        // Event listener for search input
+        receiveSearchInput.addEventListener('input', () => loadExistingData('receive'));
+        sendSearchInput.addEventListener('input', () => loadExistingData('send'));
+
+        // Event listener for status filter
+        receiveFilterStatus.addEventListener('change', () => loadExistingData('receive'));
+        sendFilterStatus.addEventListener('change', () => loadExistingData('send'));
+
+        // Function to handle editing an existing record
+        function handleEdit(id, sheetName) {
+            const dataToEdit = sheetName === 'receive'
+                ? receiveData.find(item => item.id === id)
+                : sendData.find(item => item.id === id);
+
+            if (!dataToEdit) {
+                alert('ไม่พบข้อมูลที่ต้องการแก้ไข');
+                return;
+            }
+
+            editingId = id; // Set the editing ID
+
+            const form = sheetName === 'receive' ? receiveForm : sendForm;
+            // Populate the form with the data to edit
+            for (const key in dataToEdit) {
+                const inputElement = form.elements[key];
+                if (inputElement) {
+                    inputElement.value = dataToEdit[key];
+                }
+            }
+
+            // Switch to the appropriate tab and show the form
+            switchTab(sheetName);
+        }
+
+        // Function to handle deleting a record
+        function handleDelete(id, sheetName) {
+            if (confirm('Are you sure you want to delete this record?')) {
+                const requestData = {
+                    action: 'deleteData',
+                    sheetName: sheetName,
+                    id: id,
+                };
+
+                const scriptUrl = `${SCRIPT_URL}?callback=handleDeleteResponse&data=${encodeURIComponent(JSON.stringify(requestData))}`;
+                const script = document.createElement('script');
+                script.src = scriptUrl;
+                script.async = true;
+                script.defer = true;
+                document.body.appendChild(script);
+
+                script.onload = () => {
+                    document.body.removeChild(script);
+                };
+                 script.onerror = () => {
+                    alert('Failed to delete data');
+                    document.body.removeChild(script);
+                };
+            }
+        }
+
+        // Callback function to handle the delete response from Google Apps Script
+        function handleDeleteResponse(response) {
+            if (response.success) {
+                alert('ลบข้อมูลสำเร็จ');
+                const sheetName = response.sheetName;
+                loadExistingData(sheetName); // Reload data after deletion
+            } else {
+                alert('เกิดข้อผิดพลาดในการลบข้อมูล: ' + response.message);
+            }
+        }
+
+        // Function to handle viewing details
+        function handleViewDetails(item, sheetName) {
+            let details = '';
+            for (const key in item) {
+                if (key !== 'id')
+                  details += `${key}: ${item[key]}\n`;
+            }
+            alert(details); // Display details in an alert box.  Consider using a modal for a better UI.
+        }
+
+        function updateStatistics() {
+            // Reset counters
+            let receiveTotal = 0;
+            let receivePending = 0;
+            let receiveCompleted = 0;
+            let sendTotal = 0;
+            let sendPending = 0;
+            let sendCompleted = 0;
+
+            // Calculate statistics for "หนังสือรับ"
+            receiveData.forEach(item => {
+                receiveTotal++;
+                if (item.status === 'อยู่ระหว่างเสนอ') {
+                    receivePending++;
+                } else if (item.status === 'ดำเนินการแล้วเสร็จ') {
+                    receiveCompleted++;
+                }
+            });
+
+            // Calculate statistics for "หนังสือส่ง"
+            sendData.forEach(item => {
+                sendTotal++;
+                if (item.status === 'อยู่ระหว่างเสนอ') {
+                    sendPending++;
+                } else if (item.status === 'ดำเนินการแล้วเสร็จ') {
+                    sendCompleted++;
+                }
+            });
+
+            // Update the UI
+            receiveTotalElement.textContent = receiveTotal;
+            receivePendingElement.textContent = receivePending;
+            receiveCompletedElement.textContent = receiveCompleted;
+            sendTotalElement.textContent = sendTotal;
+            sendPendingElement.textContent = sendPending;
+            sendCompletedElement.textContent = sendCompleted;
+        }
+
+        // Load initial data for the default tab (receive)
+        loadExistingData('receive');
+        loadExistingData('send');
+    </script>
+</body>
+</html>
